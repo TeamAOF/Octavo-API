@@ -1,10 +1,12 @@
 package mod.octavo.core;
 
 import com.google.gson.*;
+import mod.octavo.api.BackgroundLayer;
 import mod.octavo.api.EntrySection;
 import mod.octavo.api.Icon;
+import mod.octavo.api.Requirement;
 import mod.octavo.core.system.*;
-import mod.octavo.impl.ItemRequirement;
+import mod.octavo.impl.requirement.ItemRequirement;
 import mod.octavo.impl.requirement.ItemTagRequirement;
 import net.minecraft.client.resources.JsonReloadListener;
 import net.minecraft.item.Item;
@@ -54,7 +56,7 @@ public class ResearchLoader extends JsonReloadListener {
 				// expecting key, prefix
 				Identifier key = new Identifier(book.get("key").getAsString());
 				String prefix = book.get("prefix").getAsString();
-				ResearchBook bookObject = new ResearchBook(key, new LinkedHashMap<>(), prefix);
+				Book bookObject = new Book(key, new LinkedHashMap<>(), prefix);
 				ResearchBooks.books.putIfAbsent(key, bookObject);
 				LOGGER.info("Loaded book " + key);
 			}
@@ -75,8 +77,8 @@ public class ResearchLoader extends JsonReloadListener {
 				icon = new Identifier(icon.getNamespace(), "textures/" + icon.getPath());
 				String name = category.get("name").getAsString();
 				Identifier requirement = category.has("requires") ? new Identifier(category.get("requires").getAsString()) : null;
-				ResearchBook in = ResearchBooks.books.get(new Identifier(category.get("in").getAsString()));
-				ResearchCategory categoryObject = new ResearchCategory(new LinkedHashMap<>(), key, icon, bg, requirement, name, in);
+				Book in = ResearchBooks.books.get(new Identifier(category.get("in").getAsString()));
+				Category categoryObject = new Category(new LinkedHashMap<>(), key, icon, bg, requirement, name, in);
 				if(category.has("bgs")){
 					JsonArray layers = category.getAsJsonArray("bgs");
 					for(JsonElement layerElem : layers){
@@ -108,7 +110,7 @@ public class ResearchLoader extends JsonReloadListener {
 				String name = entry.get("name").getAsString();
 				String desc = entry.has("desc") ? entry.get("desc").getAsString() : "";
 				List<Icon> icons = idsToIcons(entry.getAsJsonArray("icons"), rl);
-				ResearchCategory category = ResearchBooks.getCategory(new Identifier(entry.get("category").getAsString()));
+				Category category = ResearchBooks.getCategory(new Identifier(entry.get("category").getAsString()));
 				int x = entry.get("x").getAsInt();
 				int y = entry.get("y").getAsInt();
 				List<EntrySection> sections = jsonToSections(entry.getAsJsonArray("sections"), rl);

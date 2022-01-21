@@ -2,18 +2,17 @@ package mod.octavo.impl;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import mod.octavo.core.Octavo;
 import net.minecraft.client.util.math.MatrixStack;
-import mod.octavo.core.system.BackgroundLayer;
+import mod.octavo.api.BackgroundLayer;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import static net.arcanamod.Arcana.arcLoc;
-
 public class ImageLayer extends BackgroundLayer{
 	
-	public static final Identifier TYPE = arcLoc("image");
+	public static final Identifier TYPE = new Identifier(Octavo.MODID,"image");
 	
 	public Identifier image;
 	

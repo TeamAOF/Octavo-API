@@ -17,27 +17,27 @@ public class ResearchBooks{
 	// public
 	// thats a bad idea I think
 	public static ArrayList<Identifier> disabled = new ArrayList<>();
-	public static Map<Identifier, ResearchBook> books = new LinkedHashMap<>();
+	public static Map<Identifier, Book> books = new LinkedHashMap<>();
 	public static Map<Identifier, Puzzle> puzzles = new LinkedHashMap<>();
 	
-	public static List<ResearchBook> getBooks(){
+	public static List<Book> getBooks(){
 		return new ArrayList<>(books.values());
 	}
 	
-	public static Stream<ResearchCategory> streamCategories(){
-		return books.values().stream().flatMap(ResearchBook::streamCategories);
+	public static Stream<Category> streamCategories(){
+		return books.values().stream().flatMap(Book::streamCategories);
 	}
 	
-	public static List<ResearchCategory> getCategories(){
+	public static List<Category> getCategories(){
 		return streamCategories().collect(Collectors.toList());
 	}
 	
-	public static ResearchCategory getCategory(Identifier key){
+	public static Category getCategory(Identifier key){
 		return streamCategories().filter(x -> x.key().equals(key)).findFirst().orElse(null);
 	}
 	
 	public static Stream<ResearchEntry> streamEntries(){
-		return streamCategories().flatMap(ResearchCategory::streamEntries);
+		return streamCategories().flatMap(Category::streamEntries);
 	}
 	
 	public static List<ResearchEntry> getEntries(){

@@ -1,7 +1,6 @@
 package mod.octavo.api;
 
 import mod.octavo.core.system.Pin;
-import mod.octavo.core.system.Requirement;
 import mod.octavo.core.system.ResearchEntry;
 import mod.octavo.impl.section.CraftingSection;
 import mod.octavo.impl.section.ImageSection;

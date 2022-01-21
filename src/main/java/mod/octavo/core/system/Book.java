@@ -2,7 +2,6 @@ package mod.octavo.core.system;
 
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Identifier;
 
 import java.util.*;
@@ -17,32 +16,32 @@ import static java.util.stream.Collectors.toMap;
  * Represents a whole research book, such as the Arcanum or Tainted Codex.
  * Contains a number of research categories, stored by key.
  */
-public class ResearchBook{
+public class Book {
 	
-	protected Map<Identifier, ResearchCategory> categories;
+	protected Map<Identifier, Category> categories;
 	private Identifier key;
 	private String prefix;
 	
-	public ResearchBook(Identifier key, Map<Identifier, ResearchCategory> categories, String prefix){
+	public Book(Identifier key, Map<Identifier, Category> categories, String prefix){
 		this.categories = categories;
 		this.key = key;
 		this.prefix = prefix;
 	}
 	
-	public ResearchCategory getCategory(Identifier key){
+	public Category getCategory(Identifier key){
 		return categories.get(key);
 	}
 	
-	public List<ResearchCategory> getCategories(){
+	public List<Category> getCategories(){
 		return new ArrayList<>(categories.values());
 	}
 	
-	public Stream<ResearchCategory> streamCategories(){
+	public Stream<Category> streamCategories(){
 		return categories.values().stream();
 	}
 	
 	public Stream<ResearchEntry> streamEntries(){
-		return streamCategories().flatMap(ResearchCategory::streamEntries);
+		return streamCategories().flatMap(Category::streamEntries);
 	}
 	
 	public List<ResearchEntry> getEntries(){
@@ -57,7 +56,7 @@ public class ResearchBook{
 		return key;
 	}
 	
-	public Map<Identifier, ResearchCategory> getCategoriesMap(){
+	public Map<Identifier, Category> getCategoriesMap(){
 		return Collections.unmodifiableMap(categories);
 	}
 	
@@ -71,7 +70,7 @@ public class ResearchBook{
 		nbt.putString("prefix", prefix);
 		NbtList list = new NbtList();
 		int index = 0;
-		for(Map.Entry<Identifier, ResearchCategory> entry : categories.entrySet()){
+		for(Map.Entry<Identifier, Category> entry : categories.entrySet()){
 			// enforce a specific order so things are transferred correctly
 			list.add(entry.getValue().serialize(entry.getKey(), index));
 			index++;
@@ -80,16 +79,16 @@ public class ResearchBook{
 		return nbt;
 	}
 	
-	public static ResearchBook deserialize(NbtCompound nbt){
+	public static Book deserialize(NbtCompound nbt){
 		Identifier key = new Identifier(nbt.getString("id"));
 		String prefix = nbt.getString("prefix");
 		NbtList categoryList = nbt.getList("categories", 10);
 		// need to have a book to put them *in*
 		// book isn't in ClientBooks until all categories have been deserialized, so this is needed
-		Map<Identifier, ResearchCategory> c = new LinkedHashMap<>();
-		ResearchBook book = new ResearchBook(key, c, prefix);
+		Map<Identifier, Category> c = new LinkedHashMap<>();
+		Book book = new Book(key, c, prefix);
 		
-		Map<Identifier, ResearchCategory> categories = StreamSupport.stream(categoryList.spliterator(), false).map(NbtCompound.class::cast).map(nbt1 -> ResearchCategory.deserialize(nbt1, book)).sorted(Comparator.comparingInt(ResearchCategory::serializationIndex)).collect(toMap(ResearchCategory::key, Function.identity(), (a, b) -> a, LinkedHashMap::new));
+		Map<Identifier, Category> categories = StreamSupport.stream(categoryList.spliterator(), false).map(NbtCompound.class::cast).map(nbt1 -> Category.deserialize(nbt1, book)).sorted(Comparator.comparingInt(Category::serializationIndex)).collect(toMap(Category::key, Function.identity(), (a, b) -> a, LinkedHashMap::new));
 		
 		// this could be replaced by adding c to ClientBooks before deserializing, but this wouldn't look any different
 		// and would leave a broken book in if an exception occurs.
@@ -100,9 +99,9 @@ public class ResearchBook{
 	public boolean equals(Object o){
 		if(this == o)
 			return true;
-		if(!(o instanceof ResearchBook))
+		if(!(o instanceof Book))
 			return false;
-		ResearchBook book = (ResearchBook)o;
+		Book book = (Book)o;
 		return getKey().equals(book.getKey());
 	}
 	

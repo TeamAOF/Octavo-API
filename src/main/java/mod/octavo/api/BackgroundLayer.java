@@ -1,4 +1,4 @@
-package mod.octavo.core.system;
+package mod.octavo.api;
 
 import com.google.gson.JsonObject;
 import net.minecraft.client.util.math.MatrixStack;

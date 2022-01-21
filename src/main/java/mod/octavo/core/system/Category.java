@@ -1,5 +1,6 @@
 package mod.octavo.core.system;
 
+import mod.octavo.api.BackgroundLayer;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Identifier;
@@ -12,17 +13,17 @@ import java.util.stream.Stream;
 /**
  * Represents a research tab. Contains a number of research entries, stored by key.
  */
-public class ResearchCategory{
+public class Category {
 	
 	protected Map<Identifier, ResearchEntry> entries;
 	private Identifier key, icon, bg, requirement;
-	private ResearchBook in;
+	private Book in;
 	private String name;
 	private List<BackgroundLayer> bgs = new ArrayList<>();
 	
 	protected int serializationIndex = 0;
 	
-	public ResearchCategory(Map<Identifier, ResearchEntry> entries, Identifier key, Identifier icon, Identifier bg, Identifier requirement, String name, ResearchBook in){
+	public Category(Map<Identifier, ResearchEntry> entries, Identifier key, Identifier icon, Identifier bg, Identifier requirement, String name, Book in){
 		this.entries = entries;
 		this.key = key;
 		this.requirement = requirement;
@@ -48,7 +49,7 @@ public class ResearchCategory{
 		return entries.values().stream();
 	}
 	
-	public ResearchBook book(){
+	public Book book(){
 		return in;
 	}
 	
@@ -95,7 +96,7 @@ public class ResearchCategory{
 		return nbt;
 	}
 	
-	public static ResearchCategory deserialize(NbtCompound nbt, ResearchBook in){
+	public static Category deserialize(NbtCompound nbt, Book in){
 		Identifier key = new Identifier(nbt.getString("id"));
 		Identifier icon = new Identifier(nbt.getString("icon"));
 		Identifier bg = new Identifier(nbt.getString("bg"));
@@ -104,7 +105,7 @@ public class ResearchCategory{
 		NbtList entriesList = nbt.getList("entries", 10);
 		// same story as ResearchBook
 		Map<Identifier, ResearchEntry> c = new LinkedHashMap<>();
-		ResearchCategory category = new ResearchCategory(c, key, icon, bg, requirement, name, in);
+		Category category = new Category(c, key, icon, bg, requirement, name, in);
 		category.serializationIndex = nbt.getInt("index");
 		
 		Map<Identifier, ResearchEntry> entries = entriesList.stream().map(NbtCompound.class::cast).map((NbtCompound nbt1) -> ResearchEntry.deserialize(nbt1, category)).collect(Collectors.toMap(ResearchEntry::key, Function.identity(), (a, b) -> a));
@@ -117,9 +118,9 @@ public class ResearchCategory{
 	public boolean equals(Object o){
 		if(this == o)
 			return true;
-		if(!(o instanceof ResearchCategory))
+		if(!(o instanceof Category))
 			return false;
-		ResearchCategory category = (ResearchCategory)o;
+		Category category = (Category)o;
 		return key().equals(category.key());
 	}
 	

@@ -1,10 +1,11 @@
-package mod.octavo.core.system;
+package mod.octavo.api;
 
-import mod.octavo.impl.*;
+import mod.octavo.core.system.ResearchEntry;
 import mod.octavo.impl.requirement.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.LinkedHashMap;
@@ -41,20 +42,11 @@ public abstract class Requirement{
 	
 	public static void init(){
 		// item and item tag requirement creation is handled by ResearchLoader -- an explicit form may be useful though.
-		deserializers.put(ItemRequirement.TYPE, compound -> new ItemRequirement(ForgeRegistries.ITEMS.getValue(new Identifier(compound.getString("itemType")))));
+		deserializers.put(ItemRequirement.TYPE, compound -> new ItemRequirement(Registry.ITEM.get(new Identifier(compound.getString("itemType")))));
 		deserializers.put(ItemTagRequirement.TYPE, compound -> new ItemTagRequirement(new Identifier(compound.getString("itemTag"))));
 		
 		factories.put(XpRequirement.TYPE, __ -> new XpRequirement());
 		deserializers.put(XpRequirement.TYPE, __ -> new XpRequirement());
-		
-		factories.put(PuzzleRequirement.TYPE, params -> new PuzzleRequirement(new Identifier(params.get(0))));
-		deserializers.put(PuzzleRequirement.TYPE, compound -> new PuzzleRequirement(new Identifier(compound.getString("puzzle"))));
-		
-		factories.put(ResearchCompletedRequirement.TYPE, params -> new ResearchCompletedRequirement(params.get(0)));
-		deserializers.put(ResearchCompletedRequirement.TYPE, compound -> new ResearchCompletedRequirement(compound.getString("requirement")));
-		
-		factories.put(PuzzlesCompletedRequirement.TYPE, __ -> new PuzzlesCompletedRequirement());
-		deserializers.put(PuzzlesCompletedRequirement.TYPE, __ -> new PuzzlesCompletedRequirement());
 	}
 	
 	////////// instance stuff

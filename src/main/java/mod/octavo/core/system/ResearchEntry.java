@@ -27,13 +27,13 @@ public class ResearchEntry{
 	private List<String> meta;
 	private List<Parent> parents;
 	private List<Icon> icons;
-	private ResearchCategory category;
+	private Category category;
 	
 	private String name, desc;
 	
 	private int x, y;
 	
-	public ResearchEntry(Identifier key, List<EntrySection> sections, List<Icon> icons, List<String> meta, List<Parent> parents, ResearchCategory category, String name, String desc, int x, int y){
+	public ResearchEntry(Identifier key, List<EntrySection> sections, List<Icon> icons, List<String> meta, List<Parent> parents, Category category, String name, String desc, int x, int y){
 		this.key = key;
 		this.sections = sections;
 		this.icons = icons;
@@ -62,7 +62,7 @@ public class ResearchEntry{
 		return parents;
 	}
 	
-	public ResearchCategory category(){
+	public Category category(){
 		return category;
 	}
 	
@@ -115,7 +115,7 @@ public class ResearchEntry{
 		return nbt;
 	}
 	
-	public static ResearchEntry deserialize(NbtCompound nbt, ResearchCategory in){
+	public static ResearchEntry deserialize(NbtCompound nbt, Category in){
 		Identifier key = new Identifier(nbt.getString("id"));
 		String name = nbt.getString("name");
 		String desc = nbt.getString("desc");
