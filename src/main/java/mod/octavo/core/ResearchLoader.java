@@ -1,15 +1,18 @@
-package net.arcanamod.systems.research;
+package mod.octavo.core;
 
 import com.google.gson.*;
-import net.arcanamod.systems.research.impls.ItemRequirement;
-import net.arcanamod.systems.research.impls.ItemTagRequirement;
+import mod.octavo.api.EntrySection;
+import mod.octavo.api.Icon;
+import mod.octavo.core.system.*;
+import mod.octavo.impl.ItemRequirement;
+import mod.octavo.impl.requirement.ItemTagRequirement;
 import net.minecraft.client.resources.JsonReloadListener;
 import net.minecraft.item.Item;
 import net.minecraft.profiler.IProfiler;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,23 +36,23 @@ public class ResearchLoader extends JsonReloadListener {
 	private static final Logger LOGGER = LogManager.getLogger();
 	public static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 	
-	private static Map<ResourceLocation, JsonArray> bookQueue = new LinkedHashMap<>();
-	private static Map<ResourceLocation, JsonArray> categoryQueue = new LinkedHashMap<>();
-	private static Map<ResourceLocation, JsonArray> entryQueue = new LinkedHashMap<>();
-	private static Map<ResourceLocation, JsonArray> puzzleQueue = new LinkedHashMap<>();
+	private static Map<Identifier, JsonArray> bookQueue = new LinkedHashMap<>();
+	private static Map<Identifier, JsonArray> categoryQueue = new LinkedHashMap<>();
+	private static Map<Identifier, JsonArray> entryQueue = new LinkedHashMap<>();
+	private static Map<Identifier, JsonArray> puzzleQueue = new LinkedHashMap<>();
 	
 	public ResearchLoader(){
 		super(GSON, "arcana/research");
 	}
 	
-	private static void applyBooksArray(ResourceLocation rl, JsonArray books){
+	private static void applyBooksArray(Identifier rl, JsonArray books){
 		for(JsonElement bookElement : books){
 			if(!bookElement.isJsonObject())
 				LOGGER.error("Non-object found in books array in " + rl + "!");
 			else{
 				JsonObject book = bookElement.getAsJsonObject();
 				// expecting key, prefix
-				ResourceLocation key = new ResourceLocation(book.get("key").getAsString());
+				Identifier key = new Identifier(book.get("key").getAsString());
 				String prefix = book.get("prefix").getAsString();
 				ResearchBook bookObject = new ResearchBook(key, new LinkedHashMap<>(), prefix);
 				ResearchBooks.books.putIfAbsent(key, bookObject);
@@ -58,28 +61,28 @@ public class ResearchLoader extends JsonReloadListener {
 		}
 	}
 	
-	private static void applyCategoriesArray(ResourceLocation rl, JsonArray categories){
+	private static void applyCategoriesArray(Identifier rl, JsonArray categories){
 		for(JsonElement categoryElement : categories){
 			if(!categoryElement.isJsonObject())
 				LOGGER.error("Non-object found in categories array in " + rl + "!");
 			else{
 				JsonObject category = categoryElement.getAsJsonObject();
 				// expecting key, in, icon, bg, optionally bgs
-				ResourceLocation key = new ResourceLocation(category.get("key").getAsString());
-				ResourceLocation bg = new ResourceLocation(category.get("bg").getAsString());
-				bg = new ResourceLocation(bg.getNamespace(), "textures/" + bg.getPath());
-				ResourceLocation icon = new ResourceLocation(category.get("icon").getAsString());
-				icon = new ResourceLocation(icon.getNamespace(), "textures/" + icon.getPath());
+				Identifier key = new Identifier(category.get("key").getAsString());
+				Identifier bg = new Identifier(category.get("bg").getAsString());
+				bg = new Identifier(bg.getNamespace(), "textures/" + bg.getPath());
+				Identifier icon = new Identifier(category.get("icon").getAsString());
+				icon = new Identifier(icon.getNamespace(), "textures/" + icon.getPath());
 				String name = category.get("name").getAsString();
-				ResourceLocation requirement = category.has("requires") ? new ResourceLocation(category.get("requires").getAsString()) : null;
-				ResearchBook in = ResearchBooks.books.get(new ResourceLocation(category.get("in").getAsString()));
+				Identifier requirement = category.has("requires") ? new Identifier(category.get("requires").getAsString()) : null;
+				ResearchBook in = ResearchBooks.books.get(new Identifier(category.get("in").getAsString()));
 				ResearchCategory categoryObject = new ResearchCategory(new LinkedHashMap<>(), key, icon, bg, requirement, name, in);
 				if(category.has("bgs")){
 					JsonArray layers = category.getAsJsonArray("bgs");
 					for(JsonElement layerElem : layers){
 						JsonObject layerObj = layerElem.getAsJsonObject();
 						BackgroundLayer layer = BackgroundLayer.makeLayer(
-								new ResourceLocation(layerObj.getAsJsonPrimitive("type").getAsString()),
+								new Identifier(layerObj.getAsJsonPrimitive("type").getAsString()),
 								layerObj,
 								rl,
 								layerObj.getAsJsonPrimitive("speed").getAsFloat(),
@@ -93,7 +96,7 @@ public class ResearchLoader extends JsonReloadListener {
 		}
 	}
 	
-	private static void applyEntriesArray(ResourceLocation rl, JsonArray entries){
+	private static void applyEntriesArray(Identifier rl, JsonArray entries){
 		for(JsonElement entryElement : entries){
 			if(!entryElement.isJsonObject())
 				LOGGER.error("Non-object found in entries array in " + rl + "!");
@@ -101,11 +104,11 @@ public class ResearchLoader extends JsonReloadListener {
 				JsonObject entry = entryElement.getAsJsonObject();
 				
 				// expecting key, name, desc, icons, category, x, y, sections
-				ResourceLocation key = new ResourceLocation(entry.get("key").getAsString());
+				Identifier key = new Identifier(entry.get("key").getAsString());
 				String name = entry.get("name").getAsString();
 				String desc = entry.has("desc") ? entry.get("desc").getAsString() : "";
 				List<Icon> icons = idsToIcons(entry.getAsJsonArray("icons"), rl);
-				ResearchCategory category = ResearchBooks.getCategory(new ResourceLocation(entry.get("category").getAsString()));
+				ResearchCategory category = ResearchBooks.getCategory(new Identifier(entry.get("category").getAsString()));
 				int x = entry.get("x").getAsInt();
 				int y = entry.get("y").getAsInt();
 				List<EntrySection> sections = jsonToSections(entry.getAsJsonArray("sections"), rl);
@@ -126,7 +129,7 @@ public class ResearchLoader extends JsonReloadListener {
 		}
 	}
 	
-	private static void applyPuzzlesArray(ResourceLocation rl, JsonArray puzzles){
+	private static void applyPuzzlesArray(Identifier rl, JsonArray puzzles){
 		for(JsonElement puzzleElement : puzzles)
 			if(!puzzleElement.isJsonObject())
 				LOGGER.error("Non-object found in puzzles array in " + rl + "!");
@@ -134,10 +137,10 @@ public class ResearchLoader extends JsonReloadListener {
 				JsonObject puzzle = puzzleElement.getAsJsonObject();
 				// expecting key, type
 				// then I pass the object along
-				ResourceLocation key = new ResourceLocation(puzzle.get("key").getAsString());
+				Identifier key = new Identifier(puzzle.get("key").getAsString());
 				String type = puzzle.get("type").getAsString();
 				// optionally desc, icon
-				ResourceLocation icon = puzzle.has("icon") ? new ResourceLocation(puzzle.get("icon").getAsString()) : null;
+				Identifier icon = puzzle.has("icon") ? new Identifier(puzzle.get("icon").getAsString()) : null;
 				String desc = puzzle.has("desc") ? puzzle.get("desc").getAsString() : null;
 				// make it
 				Puzzle puzzleObject = Puzzle.makePuzzle(type, desc, key, icon, puzzle, rl);
@@ -148,7 +151,7 @@ public class ResearchLoader extends JsonReloadListener {
 			}
 	}
 	
-	public static void applyJson(JsonObject json, ResourceLocation rl){
+	public static void applyJson(JsonObject json, Identifier rl){
 		if(json.has("books")){
 			JsonArray books = json.getAsJsonArray("books");
 			bookQueue.put(rl, books);
@@ -167,7 +170,7 @@ public class ResearchLoader extends JsonReloadListener {
 		}
 	}
 	
-	private static List<Icon> idsToIcons(JsonArray itemIds, ResourceLocation rl){
+	private static List<Icon> idsToIcons(JsonArray itemIds, Identifier rl){
 		List<Icon> ret = new ArrayList<>();
 		for(JsonElement element : itemIds){
 			ret.add(Icon.fromString(element.getAsString()));
@@ -177,7 +180,7 @@ public class ResearchLoader extends JsonReloadListener {
 		return ret;
 	}
 	
-	private static List<EntrySection> jsonToSections(JsonArray sections, ResourceLocation file){
+	private static List<EntrySection> jsonToSections(JsonArray sections, Identifier file){
 		List<EntrySection> ret = new ArrayList<>();
 		for(JsonElement sectionElement : sections)
 			if(sectionElement.isJsonObject()){
@@ -205,7 +208,7 @@ public class ResearchLoader extends JsonReloadListener {
 		return ret;
 	}
 	
-	private static List<Requirement> jsonToRequirements(JsonArray requirements, ResourceLocation file){
+	private static List<Requirement> jsonToRequirements(JsonArray requirements, Identifier file){
 		List<Requirement> ret = new ArrayList<>();
 		for(JsonElement requirementElement : requirements){
 			if(requirementElement.isJsonPrimitive()){
@@ -232,7 +235,7 @@ public class ResearchLoader extends JsonReloadListener {
 					String[] parts = desc.split("::");
 					if(parts.length != 2)
 						LOGGER.error("Multiple \"::\"s found in requirement in " + file + "!");
-					ResourceLocation type = new ResourceLocation(parts[0], parts[1]);
+					Identifier type = new Identifier(parts[0], parts[1]);
 					Requirement add = Requirement.makeRequirement(type, params);
 					if(add != null){
 						add.amount = amount;
@@ -242,7 +245,7 @@ public class ResearchLoader extends JsonReloadListener {
 				// if this begins with a hash
 				}else if(desc.startsWith("#")){
 					// its a tag
-					ResourceLocation itemTagLoc = new ResourceLocation(desc.substring(1));
+					Identifier itemTagLoc = new Identifier(desc.substring(1));
 					ITag<Item> itemTag = ItemTags.getCollection().get(itemTagLoc);
 					if(itemTag != null){
 						ItemTagRequirement tagReq = new ItemTagRequirement(itemTag, itemTagLoc);
@@ -252,7 +255,7 @@ public class ResearchLoader extends JsonReloadListener {
 						LOGGER.error("Invalid item tag " + itemTagLoc + " found in file " + file + "!");
 				}else{
 					// its an item
-					ResourceLocation item = new ResourceLocation(desc);
+					Identifier item = new Identifier(desc);
 					Item value = ForgeRegistries.ITEMS.getValue(item);
 					if(value != null){
 						ItemRequirement add = new ItemRequirement(value);
@@ -266,7 +269,7 @@ public class ResearchLoader extends JsonReloadListener {
 		return ret;
 	}
 	
-	protected void apply(Map<ResourceLocation, JsonElement> object, IResourceManager resourceManager, IProfiler profiler){
+	protected void apply(Map<Identifier, JsonElement> object, IResourceManager resourceManager, IProfiler profiler){
 		bookQueue.clear();
 		categoryQueue.clear();
 		entryQueue.clear();

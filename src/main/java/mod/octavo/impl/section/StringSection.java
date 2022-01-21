@@ -1,7 +1,7 @@
-package net.arcanamod.systems.research.impls;
+package mod.octavo.impl.section;
 
-import net.arcanamod.systems.research.EntrySection;
-import net.minecraft.nbt.CompoundNBT;
+import mod.octavo.api.EntrySection;
+import net.minecraft.nbt.NbtCompound;
 
 import java.util.Objects;
 
@@ -22,8 +22,8 @@ public class StringSection extends EntrySection{
 		return TYPE;
 	}
 	
-	public CompoundNBT getData(){
-		CompoundNBT tag = new CompoundNBT();
+	public NbtCompound getData(){
+		NbtCompound tag = new NbtCompound();
 		tag.putString("text", getText());
 		return tag;
 	}

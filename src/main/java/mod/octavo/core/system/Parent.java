@@ -1,20 +1,21 @@
-package net.arcanamod.systems.research;
+package mod.octavo.core.system;
 
 import net.arcanamod.capabilities.Researcher;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.ResourceLocationException;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.IdentifierException;
+import net.minecraft.util.InvalidIdentifierException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class Parent{
 	
-	ResourceLocation entry;
+	Identifier entry;
 	int stage = -1;
 	boolean showArrowhead = true, showLine = true, reverseLine = false;
 	
 	public static Logger LOGGER = LogManager.getLogger();
 	
-	public Parent(ResourceLocation entry){
+	public Parent(Identifier entry){
 		this.entry = entry;
 	}
 	
@@ -46,8 +47,8 @@ public class Parent{
 			}
 		}
 		try{
-			parent.entry = new ResourceLocation(text);
-		}catch(ResourceLocationException exception){
+			parent.entry = new Identifier(text);
+		}catch(InvalidIdentifierException exception){
 			LOGGER.error("Invalid entry \"" + text + "\" found in parent \"" + original + "\"!");
 		}
 		return parent;
@@ -57,7 +58,7 @@ public class Parent{
 		return (!showLine ? "~" : "") + (!showArrowhead ? "&" : "")+ (reverseLine ? "/" : "") + entry + (stage != -1 ? "@" + stage : "");
 	}
 	
-	public ResourceLocation getEntry(){
+	public Identifier getEntry(){
 		return entry;
 	}
 	

@@ -1,24 +1,24 @@
-package net.arcanamod.systems.research.impls;
+package mod.octavo.impl.requirement;
 
 import net.arcanamod.capabilities.Researcher;
 import net.arcanamod.network.Connection;
-import net.arcanamod.systems.research.Puzzle;
-import net.arcanamod.systems.research.Requirement;
-import net.arcanamod.systems.research.ResearchBooks;
-import net.arcanamod.systems.research.ResearchEntry;
+import mod.octavo.core.system.Puzzle;
+import mod.octavo.core.system.Requirement;
+import mod.octavo.core.system.ResearchBooks;
+import mod.octavo.core.system.ResearchEntry;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Identifier;
 
 import static net.arcanamod.Arcana.arcLoc;
 
 public class PuzzleRequirement extends Requirement{
 	
-	public static final ResourceLocation TYPE = arcLoc("puzzle");
+	public static final Identifier TYPE = arcLoc("puzzle");
 	
-	protected ResourceLocation puzzleId;
+	protected Identifier puzzleId;
 	
-	public PuzzleRequirement(ResourceLocation puzzleId){
+	public PuzzleRequirement(Identifier puzzleId){
 		this.puzzleId = puzzleId;
 	}
 	
@@ -30,12 +30,12 @@ public class PuzzleRequirement extends Requirement{
 		// no-op
 	}
 	
-	public ResourceLocation type(){
+	public Identifier type(){
 		return TYPE;
 	}
 	
-	public CompoundNBT data(){
-		CompoundNBT compound = new CompoundNBT();
+	public NbtCompound data(){
+		NbtCompound compound = new NbtCompound();
 		compound.putString("puzzle", puzzleId.toString());
 		return compound;
 	}
@@ -47,7 +47,7 @@ public class PuzzleRequirement extends Requirement{
 		return false;
 	}
 	
-	public ResourceLocation getPuzzleId(){
+	public Identifier getPuzzleId(){
 		return puzzleId;
 	}
 }

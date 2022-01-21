@@ -1,12 +1,12 @@
-package net.arcanamod.systems.research.impls;
+package mod.octavo.impl.section;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 
 public class CraftingSection extends AbstractCraftingSection{
 	
 	public static final String TYPE = "crafting";
 	
-	public CraftingSection(ResourceLocation recipe){
+	public CraftingSection(Identifier recipe){
 		super(recipe);
 	}
 	

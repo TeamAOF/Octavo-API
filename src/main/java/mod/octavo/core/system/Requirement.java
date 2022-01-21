@@ -1,9 +1,10 @@
-package net.arcanamod.systems.research;
+package mod.octavo.core.system;
 
-import net.arcanamod.systems.research.impls.*;
+import mod.octavo.impl.*;
+import mod.octavo.impl.requirement.*;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.LinkedHashMap;
@@ -16,19 +17,19 @@ public abstract class Requirement{
 	
 	////////// static stuff
 	
-	private static Map<ResourceLocation, Function<List<String>, Requirement>> factories = new LinkedHashMap<>();
-	private static Map<ResourceLocation, Function<CompoundNBT, Requirement>> deserializers = new LinkedHashMap<>();
+	private static Map<Identifier, Function<List<String>, Requirement>> factories = new LinkedHashMap<>();
+	private static Map<Identifier, Function<NbtCompound, Requirement>> deserializers = new LinkedHashMap<>();
 	
-	public static Requirement makeRequirement(ResourceLocation type, List<String> content){
+	public static Requirement makeRequirement(Identifier type, List<String> content){
 		if(factories.get(type) != null)
 			return factories.get(type).apply(content);
 		else
 			return null;
 	}
 	
-	public static Requirement deserialize(CompoundNBT passData){
-		ResourceLocation type = new ResourceLocation(passData.getString("type"));
-		CompoundNBT data = passData.getCompound("data");
+	public static Requirement deserialize(NbtCompound passData){
+		Identifier type = new Identifier(passData.getString("type"));
+		NbtCompound data = passData.getCompound("data");
 		int amount = passData.getInt("amount");
 		if(deserializers.get(type) != null){
 			Requirement requirement = deserializers.get(type).apply(data);
@@ -40,14 +41,14 @@ public abstract class Requirement{
 	
 	public static void init(){
 		// item and item tag requirement creation is handled by ResearchLoader -- an explicit form may be useful though.
-		deserializers.put(ItemRequirement.TYPE, compound -> new ItemRequirement(ForgeRegistries.ITEMS.getValue(new ResourceLocation(compound.getString("itemType")))));
-		deserializers.put(ItemTagRequirement.TYPE, compound -> new ItemTagRequirement(new ResourceLocation(compound.getString("itemTag"))));
+		deserializers.put(ItemRequirement.TYPE, compound -> new ItemRequirement(ForgeRegistries.ITEMS.getValue(new Identifier(compound.getString("itemType")))));
+		deserializers.put(ItemTagRequirement.TYPE, compound -> new ItemTagRequirement(new Identifier(compound.getString("itemTag"))));
 		
 		factories.put(XpRequirement.TYPE, __ -> new XpRequirement());
 		deserializers.put(XpRequirement.TYPE, __ -> new XpRequirement());
 		
-		factories.put(PuzzleRequirement.TYPE, params -> new PuzzleRequirement(new ResourceLocation(params.get(0))));
-		deserializers.put(PuzzleRequirement.TYPE, compound -> new PuzzleRequirement(new ResourceLocation(compound.getString("puzzle"))));
+		factories.put(PuzzleRequirement.TYPE, params -> new PuzzleRequirement(new Identifier(params.get(0))));
+		deserializers.put(PuzzleRequirement.TYPE, compound -> new PuzzleRequirement(new Identifier(compound.getString("puzzle"))));
 		
 		factories.put(ResearchCompletedRequirement.TYPE, params -> new ResearchCompletedRequirement(params.get(0)));
 		deserializers.put(ResearchCompletedRequirement.TYPE, compound -> new ResearchCompletedRequirement(compound.getString("requirement")));
@@ -64,8 +65,8 @@ public abstract class Requirement{
 		return amount;
 	}
 	
-	public CompoundNBT getPassData(){
-		CompoundNBT nbt = new CompoundNBT();
+	public NbtCompound getPassData(){
+		NbtCompound nbt = new NbtCompound();
 		nbt.putString("type", type().toString());
 		nbt.put("data", data());
 		nbt.putInt("amount", getAmount());
@@ -81,9 +82,9 @@ public abstract class Requirement{
 	
 	public abstract void take(PlayerEntity player);
 	
-	public abstract ResourceLocation type();
+	public abstract Identifier type();
 	
-	public abstract CompoundNBT data();
+	public abstract NbtCompound data();
 	
 	public boolean onClick(ResearchEntry entry, PlayerEntity player){
 		return false;

@@ -1,12 +1,12 @@
-package net.arcanamod.systems.research.impls;
+package mod.octavo.impl.section;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 
 public class SmeltingSection extends AbstractCraftingSection{
 	
 	public static final String TYPE = "smelting";
 	
-	public SmeltingSection(ResourceLocation recipe){
+	public SmeltingSection(Identifier recipe){
 		super(recipe);
 	}
 	

@@ -1,19 +1,15 @@
-package net.arcanamod.systems.research;
+package mod.octavo.core.system;
 
 import com.google.gson.JsonObject;
 import net.arcanamod.aspects.handlers.AspectHandler;
 import net.arcanamod.containers.ResearchTableContainer;
 import net.arcanamod.containers.slots.AspectSlot;
-import net.arcanamod.systems.research.impls.Chemistry;
-import net.arcanamod.systems.research.impls.Fieldwork;
-import net.arcanamod.systems.research.impls.Guesswork;
-import net.arcanamod.systems.research.impls.Thaumaturgy;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.container.Slot;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Identifier;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +23,9 @@ public abstract class Puzzle{
 	// I can't bother to add addon support for custom puzzles,
 	// if anyone wants to do that, *then* I'll add it
 	private static Map<String, Supplier<Puzzle>> factories = new LinkedHashMap<>();
-	private static Map<String, Function<CompoundNBT, Puzzle>> deserializers = new LinkedHashMap<>();
+	private static Map<String, Function<NbtCompound, Puzzle>> deserializers = new LinkedHashMap<>();
 	
-	public static Puzzle makePuzzle(String type, @Nullable String desc, ResourceLocation key, @Nullable ResourceLocation icon, JsonObject content, ResourceLocation file){
+	public static Puzzle makePuzzle(String type, @Nullable String desc, Identifier key, @Nullable Identifier icon, JsonObject content, Identifier file){
 		if(getBlank(type) != null){
 			Puzzle puzzle = getBlank(type).get();
 			puzzle.key = key;
@@ -45,12 +41,12 @@ public abstract class Puzzle{
 		return factories.get(type);
 	}
 	
-	public static Puzzle deserialize(CompoundNBT passData){
+	public static Puzzle deserialize(NbtCompound passData){
 		String type = passData.getString("type");
 		String desc = passData.getString("desc");
-		ResourceLocation key = new ResourceLocation(passData.getString("key"));
-		ResourceLocation icon = new ResourceLocation(passData.getString("icon"));
-		CompoundNBT data = passData.getCompound("data");
+		Identifier key = new Identifier(passData.getString("key"));
+		Identifier icon = new Identifier(passData.getString("icon"));
+		NbtCompound data = passData.getCompound("data");
 		if(deserializers.get(type) != null){
 			Puzzle puzzle = deserializers.get(type).apply(data);
 			puzzle.key = key;
@@ -74,18 +70,18 @@ public abstract class Puzzle{
 	
 	////////////////////// INSTANCE STUFF
 	
-	ResourceLocation key, icon;
+	Identifier key, icon;
 	String desc;
 	
-	public abstract void load(JsonObject data, ResourceLocation file);
+	public abstract void load(JsonObject data, Identifier file);
 	
 	public abstract String type();
 	
-	public abstract CompoundNBT getData();
+	public abstract NbtCompound getData();
 	
 	public abstract String getDefaultDesc();
 	
-	public abstract ResourceLocation getDefaultIcon();
+	public abstract Identifier getDefaultIcon();
 	
 	public abstract List<SlotInfo> getItemSlotLocations(PlayerEntity player);
 	
@@ -97,12 +93,12 @@ public abstract class Puzzle{
 		return desc;
 	}
 	
-	public ResourceLocation getIcon(){
+	public Identifier getIcon(){
 		return icon;
 	}
 	
-	public CompoundNBT getPassData(){
-		CompoundNBT passData = new CompoundNBT();
+	public NbtCompound getPassData(){
+		NbtCompound passData = new NbtCompound();
 		passData.putString("type", type());
 		passData.putString("key", getKey().toString());
 		passData.putString("desc", getDesc() != null ? getDesc() : "null");
@@ -111,7 +107,7 @@ public abstract class Puzzle{
 		return passData;
 	}
 	
-	public ResourceLocation getKey(){
+	public Identifier getKey(){
 		return key;
 	}
 	

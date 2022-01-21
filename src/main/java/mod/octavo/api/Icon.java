@@ -1,17 +1,19 @@
-package net.arcanamod.systems.research;
+package mod.octavo.api;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import mod.octavo.core.system.Pin;
+import mod.octavo.core.system.ResearchEntry;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
@@ -26,7 +28,7 @@ import java.util.regex.Pattern;
  * @see Pin
  * @see JsonToNBT
  */
-public class Icon{
+public record Icon(Identifier Identifier, ItemStack stack) {
 	
 	// Either an item, with optional NBT data, or an direct image reference.
 	// Images are assumed to be in <namespace>:textures/.
@@ -37,17 +39,13 @@ public class Icon{
 	
 	private static final Logger LOGGER = LogManager.getLogger();
 	
-	private ResourceLocation resourceLocation;
-	@Nullable
-	private ItemStack stack;
-	
-	public Icon(ResourceLocation resourceLocation, @Nullable ItemStack stack){
-		this.resourceLocation = resourceLocation;
+	public Icon(Identifier Identifier, @Nullable ItemStack stack){
+		this.Identifier = Identifier;
 		this.stack = stack;
 	}
 	
 	public Icon(ItemStack stack){
-		this.resourceLocation = stack.getItem().getRegistryName();
+		this.Identifier = stack.getItem().getRegistryName();
 		this.stack = stack;
 	}
 	
@@ -56,13 +54,13 @@ public class Icon{
 		return stack;
 	}
 	
-	public ResourceLocation getResourceLocation(){
-		return resourceLocation;
+	public Identifier getIdentifier(){
+		return Identifier;
 	}
 	
 	public static Icon fromString(String string){
 		// Check if theres NBT data.
-		CompoundNBT tag = null;
+		NbtCompound tag = null;
 		if(string.contains("{")){
 			String[] split = string.split("\\{", 2);
 			try{
@@ -74,7 +72,7 @@ public class Icon{
 			}
 		}
 		// Check if there's an item that corresponds to the ID.
-		ResourceLocation key = new ResourceLocation(string);
+		Identifier key = new Identifier(string);
 		if(ForgeRegistries.ITEMS.containsKey(key)){
 			Item item = ForgeRegistries.ITEMS.getValue(key);
 			ItemStack stack = new ItemStack(item);
@@ -89,22 +87,22 @@ public class Icon{
 		if(tag != null)
 			LOGGER.error("NBT data was encoded for research entry icon " + key + ", but " + key + " is not an item!");
 		// Add "textures/" to path.
-		key = new ResourceLocation(key.getNamespace(), "textures/" + key.getPath());
+		key = new Identifier(key.getNamespace(), "textures/" + key.getPath());
 		return new Icon(key, null);
 	}
 	
 	public String toString(){
 		// If ItemStack is null, just provide the key, but substring'd by 9.
 		if(stack == null)
-			return new ResourceLocation(resourceLocation.getNamespace(), resourceLocation.getPath().substring(9)).toString();
+			return new Identifier(Identifier.getNamespace(), Identifier.getPath().substring(9)).toString();
 		// If there's no NBT, just send over the item's ID.
 		if(!stack.hasTag())
-			return resourceLocation.toString();
+			return Identifier.toString();
 		// Otherwise, we need to send over both.
-		return resourceLocation.toString() + nbtToJson(stack.getTag());
+		return Identifier.toString() + nbtToJson(stack.getTag());
 	}
 	
-	private static String nbtToJson(CompoundNBT nbt){
+	private static String nbtToJson(NbtCompound nbt){
 		StringBuilder stringbuilder = new StringBuilder("{");
 		Collection<String> collection = nbt.keySet();
 		

@@ -1,9 +1,8 @@
-package net.arcanamod.systems.research;
+package mod.octavo.core.system;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.util.Constants;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.util.Identifier;
 
 import java.util.*;
 import java.util.function.Function;
@@ -15,15 +14,15 @@ import java.util.stream.Stream;
  */
 public class ResearchCategory{
 	
-	protected Map<ResourceLocation, ResearchEntry> entries;
-	private ResourceLocation key, icon, bg, requirement;
+	protected Map<Identifier, ResearchEntry> entries;
+	private Identifier key, icon, bg, requirement;
 	private ResearchBook in;
 	private String name;
 	private List<BackgroundLayer> bgs = new ArrayList<>();
 	
 	protected int serializationIndex = 0;
 	
-	public ResearchCategory(Map<ResourceLocation, ResearchEntry> entries, ResourceLocation key, ResourceLocation icon, ResourceLocation bg, ResourceLocation requirement, String name, ResearchBook in){
+	public ResearchCategory(Map<Identifier, ResearchEntry> entries, Identifier key, Identifier icon, Identifier bg, Identifier requirement, String name, ResearchBook in){
 		this.entries = entries;
 		this.key = key;
 		this.requirement = requirement;
@@ -33,7 +32,7 @@ public class ResearchCategory{
 		this.bg = bg;
 	}
 	
-	public ResourceLocation key(){
+	public Identifier key(){
 		return key;
 	}
 	
@@ -53,7 +52,7 @@ public class ResearchCategory{
 		return in;
 	}
 	
-	public ResourceLocation icon(){
+	public Identifier icon(){
 		return icon;
 	}
 	
@@ -61,7 +60,7 @@ public class ResearchCategory{
 		return name;
 	}
 	
-	public ResourceLocation bg(){
+	public Identifier bg(){
 		return bg;
 	}
 	
@@ -73,12 +72,12 @@ public class ResearchCategory{
 		return serializationIndex;
 	}
 	
-	public ResourceLocation requirement(){
+	public Identifier requirement(){
 		return requirement;
 	}
 	
-	public CompoundNBT serialize(ResourceLocation tag, int index){
-		CompoundNBT nbt = new CompoundNBT();
+	public NbtCompound serialize(Identifier tag, int index){
+		NbtCompound nbt = new NbtCompound();
 		nbt.putString("id", tag.toString());
 		nbt.putString("icon", icon.toString());
 		nbt.putString("bg", bg.toString());
@@ -86,32 +85,32 @@ public class ResearchCategory{
 		nbt.putString("name", name);
 		nbt.putInt("index", index);
 		
-		ListNBT list = new ListNBT();
+		NbtList list = new NbtList();
 		entries.forEach((location, entry) -> list.add(entry.serialize(location)));
 		nbt.put("entries", list);
 		
-		ListNBT bgsList = new ListNBT();
+		NbtList bgsList = new NbtList();
 		bgs.forEach(layer -> bgsList.add(layer.getPassData()));
 		nbt.put("bgs", bgsList);
 		return nbt;
 	}
 	
-	public static ResearchCategory deserialize(CompoundNBT nbt, ResearchBook in){
-		ResourceLocation key = new ResourceLocation(nbt.getString("id"));
-		ResourceLocation icon = new ResourceLocation(nbt.getString("icon"));
-		ResourceLocation bg = new ResourceLocation(nbt.getString("bg"));
-		ResourceLocation requirement = nbt.getString("requirement").equals("null") ? null : new ResourceLocation(nbt.getString("requirement"));
+	public static ResearchCategory deserialize(NbtCompound nbt, ResearchBook in){
+		Identifier key = new Identifier(nbt.getString("id"));
+		Identifier icon = new Identifier(nbt.getString("icon"));
+		Identifier bg = new Identifier(nbt.getString("bg"));
+		Identifier requirement = nbt.getString("requirement").equals("null") ? null : new Identifier(nbt.getString("requirement"));
 		String name = nbt.getString("name");
-		ListNBT entriesList = nbt.getList("entries", 10);
+		NbtList entriesList = nbt.getList("entries", 10);
 		// same story as ResearchBook
-		Map<ResourceLocation, ResearchEntry> c = new LinkedHashMap<>();
+		Map<Identifier, ResearchEntry> c = new LinkedHashMap<>();
 		ResearchCategory category = new ResearchCategory(c, key, icon, bg, requirement, name, in);
 		category.serializationIndex = nbt.getInt("index");
 		
-		Map<ResourceLocation, ResearchEntry> entries = entriesList.stream().map(CompoundNBT.class::cast).map((CompoundNBT nbt1) -> ResearchEntry.deserialize(nbt1, category)).collect(Collectors.toMap(ResearchEntry::key, Function.identity(), (a, b) -> a));
+		Map<Identifier, ResearchEntry> entries = entriesList.stream().map(NbtCompound.class::cast).map((NbtCompound nbt1) -> ResearchEntry.deserialize(nbt1, category)).collect(Collectors.toMap(ResearchEntry::key, Function.identity(), (a, b) -> a));
 		c.putAll(entries);
 		
-		category.bgs = nbt.getList("bgs", Constants.NBT.TAG_COMPOUND).stream().map(CompoundNBT.class::cast).map(BackgroundLayer::deserialize).collect(Collectors.toList());
+		category.bgs = nbt.getList("bgs", Constants.NBT.TAG_COMPOUND).stream().map(NbtCompound.class::cast).map(BackgroundLayer::deserialize).collect(Collectors.toList());
 		return category;
 	}
 	

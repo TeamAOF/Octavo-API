@@ -1,17 +1,17 @@
-package net.arcanamod.systems.research.impls;
+package mod.octavo.impl.requirement;
 
 import net.arcanamod.capabilities.Researcher;
-import net.arcanamod.systems.research.Parent;
-import net.arcanamod.systems.research.Requirement;
+import mod.octavo.core.system.Parent;
+import mod.octavo.core.system.Requirement;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Identifier;
 
 import static net.arcanamod.Arcana.arcLoc;
 
 public class ResearchCompletedRequirement extends Requirement{
 	
-	public static final ResourceLocation TYPE = arcLoc("research_completed");
+	public static final Identifier TYPE = arcLoc("research_completed");
 	
 	protected Parent req;
 	
@@ -27,12 +27,12 @@ public class ResearchCompletedRequirement extends Requirement{
 		// no-op
 	}
 	
-	public ResourceLocation type(){
+	public Identifier type(){
 		return TYPE;
 	}
 	
-	public CompoundNBT data(){
-		CompoundNBT compound = new CompoundNBT();
+	public NbtCompound data(){
+		NbtCompound compound = new NbtCompound();
 		compound.putString("requirement", req.asString());
 		return compound;
 	}

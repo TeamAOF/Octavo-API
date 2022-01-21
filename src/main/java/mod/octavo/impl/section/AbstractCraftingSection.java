@@ -1,13 +1,13 @@
-package net.arcanamod.systems.research.impls;
+package mod.octavo.impl.section;
 
-import net.arcanamod.systems.research.EntrySection;
-import net.arcanamod.systems.research.Icon;
-import net.arcanamod.systems.research.Pin;
-import net.arcanamod.systems.research.ResearchEntry;
-import net.minecraft.item.Item;
+import mod.octavo.api.EntrySection;
+import mod.octavo.api.Icon;
+import mod.octavo.core.system.Pin;
+import mod.octavo.core.system.ResearchEntry;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Identifier
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
@@ -15,24 +15,24 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public abstract class AbstractCraftingSection extends EntrySection{
-	
-	ResourceLocation recipe;
-	
+
+	Identifier recipe;
+
 	public AbstractCraftingSection(ResourceLocation recipe){
 		this.recipe = recipe;
 	}
 	
-	public AbstractCraftingSection(String s){
-		this(new ResourceLocation(s));
+	public AbsIdentifiertion(String s){
+		this(new Identifier(s));
 	}
 	
-	public CompoundNBT getData(){
-		CompoundNBT compound = new CompoundNBT();
+	public NbtCompound getData(){
+		NbtCompound compound = new NbtCompound();
 		compound.putString("recipe", recipe.toString());
 		return compound;
 	}
-	
-	public ResourceLocation getRecipe(){
+
+	public Identifier getRecipe(){
 		return recipe;
 	}
 	

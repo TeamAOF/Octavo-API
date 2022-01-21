@@ -1,11 +1,11 @@
-package net.arcanamod.systems.research.impls;
+package mod.octavo.impl;
 
-import net.arcanamod.systems.research.Requirement;
+import mod.octavo.core.system.Requirement;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import static net.arcanamod.Arcana.arcLoc;
@@ -16,7 +16,7 @@ public class ItemRequirement extends Requirement{
 	protected Item item;
 	protected ItemStack stack;
 	
-	public static final ResourceLocation TYPE = arcLoc("item");
+	public static final Identifier TYPE = arcLoc("item");
 	
 	public ItemRequirement(Item item){
 		this.item = item;
@@ -30,12 +30,12 @@ public class ItemRequirement extends Requirement{
 		player.inventory.func_234564_a_(x -> x.getItem() == item, getAmount(), player.container.func_234641_j_());
 	}
 	
-	public ResourceLocation type(){
+	public Identifier type(){
 		return TYPE;
 	}
 	
-	public CompoundNBT data(){
-		CompoundNBT compound = new CompoundNBT();
+	public NbtCompound data(){
+		NbtCompound compound = new NbtCompound();
 		compound.putString("itemType", String.valueOf(ForgeRegistries.ITEMS.getKey(item)));
 		return compound;
 	}

@@ -1,27 +1,27 @@
-package net.arcanamod.systems.research.impls;
+package mod.octavo.impl.requirement;
 
-import net.arcanamod.systems.research.Requirement;
+import mod.octavo.core.system.Requirement;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.tags.ITag;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 
 import static net.arcanamod.Arcana.arcLoc;
 
 public class ItemTagRequirement extends Requirement{
 	
 	protected ITag<Item> tag;
-	protected ResourceLocation tagName;
+	protected Identifier tagName;
 	
-	public static final ResourceLocation TYPE = arcLoc("item_tag");
+	public static final Identifier TYPE = arcLoc("item_tag");
 	
-	public ItemTagRequirement(ResourceLocation tagName){
+	public ItemTagRequirement(Identifier tagName){
 		this(ItemTags.getCollection().get(tagName), tagName);
 	}
 	
-	public ItemTagRequirement(ITag<Item> tag, ResourceLocation tagName){
+	public ItemTagRequirement(ITag<Item> tag, Identifier tagName){
 		this.tag = tag;
 	}
 	
@@ -33,12 +33,12 @@ public class ItemTagRequirement extends Requirement{
 		player.inventory.func_234564_a_(x -> x.getItem().isIn(tag), getAmount(), player.container.func_234641_j_());
 	}
 	
-	public ResourceLocation type(){
+	public Identifier type(){
 		return TYPE;
 	}
 	
-	public CompoundNBT data(){
-		CompoundNBT compound = new CompoundNBT();
+	public NbtCompound data(){
+		NbtCompound compound = new NbtCompound();
 		compound.putString("itemTag", tagName.toString());
 		return compound;
 	}
@@ -47,7 +47,7 @@ public class ItemTagRequirement extends Requirement{
 		return tag;
 	}
 	
-	public ResourceLocation getTagName(){
+	public Identifier getTagName(){
 		return tagName;
 	}
 }

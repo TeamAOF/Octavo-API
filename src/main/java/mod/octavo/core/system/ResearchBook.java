@@ -1,8 +1,9 @@
-package net.arcanamod.systems.research;
+package mod.octavo.core.system;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.util.Identifier;
 
 import java.util.*;
 import java.util.function.Function;
@@ -18,17 +19,17 @@ import static java.util.stream.Collectors.toMap;
  */
 public class ResearchBook{
 	
-	protected Map<ResourceLocation, ResearchCategory> categories;
-	private ResourceLocation key;
+	protected Map<Identifier, ResearchCategory> categories;
+	private Identifier key;
 	private String prefix;
 	
-	public ResearchBook(ResourceLocation key, Map<ResourceLocation, ResearchCategory> categories, String prefix){
+	public ResearchBook(Identifier key, Map<Identifier, ResearchCategory> categories, String prefix){
 		this.categories = categories;
 		this.key = key;
 		this.prefix = prefix;
 	}
 	
-	public ResearchCategory getCategory(ResourceLocation key){
+	public ResearchCategory getCategory(Identifier key){
 		return categories.get(key);
 	}
 	
@@ -48,15 +49,15 @@ public class ResearchBook{
 		return streamEntries().collect(Collectors.toList());
 	}
 	
-	public ResearchEntry getEntry(ResourceLocation key){
+	public ResearchEntry getEntry(Identifier key){
 		return streamEntries().filter(entry -> entry.key().equals(key)).findFirst().orElse(null);
 	}
 	
-	public ResourceLocation getKey(){
+	public Identifier getKey(){
 		return key;
 	}
 	
-	public Map<ResourceLocation, ResearchCategory> getCategoriesMap(){
+	public Map<Identifier, ResearchCategory> getCategoriesMap(){
 		return Collections.unmodifiableMap(categories);
 	}
 	
@@ -64,13 +65,13 @@ public class ResearchBook{
 		return prefix;
 	}
 	
-	public CompoundNBT serialize(ResourceLocation tag){
-		CompoundNBT nbt = new CompoundNBT();
+	public NbtCompound serialize(Identifier tag){
+		NbtCompound nbt = new NbtCompound();
 		nbt.putString("id", tag.toString());
 		nbt.putString("prefix", prefix);
-		ListNBT list = new ListNBT();
+		NbtList list = new NbtList();
 		int index = 0;
-		for(Map.Entry<ResourceLocation, ResearchCategory> entry : categories.entrySet()){
+		for(Map.Entry<Identifier, ResearchCategory> entry : categories.entrySet()){
 			// enforce a specific order so things are transferred correctly
 			list.add(entry.getValue().serialize(entry.getKey(), index));
 			index++;
@@ -79,16 +80,16 @@ public class ResearchBook{
 		return nbt;
 	}
 	
-	public static ResearchBook deserialize(CompoundNBT nbt){
-		ResourceLocation key = new ResourceLocation(nbt.getString("id"));
+	public static ResearchBook deserialize(NbtCompound nbt){
+		Identifier key = new Identifier(nbt.getString("id"));
 		String prefix = nbt.getString("prefix");
-		ListNBT categoryList = nbt.getList("categories", 10);
+		NbtList categoryList = nbt.getList("categories", 10);
 		// need to have a book to put them *in*
 		// book isn't in ClientBooks until all categories have been deserialized, so this is needed
-		Map<ResourceLocation, ResearchCategory> c = new LinkedHashMap<>();
+		Map<Identifier, ResearchCategory> c = new LinkedHashMap<>();
 		ResearchBook book = new ResearchBook(key, c, prefix);
 		
-		Map<ResourceLocation, ResearchCategory> categories = StreamSupport.stream(categoryList.spliterator(), false).map(CompoundNBT.class::cast).map(nbt1 -> ResearchCategory.deserialize(nbt1, book)).sorted(Comparator.comparingInt(ResearchCategory::serializationIndex)).collect(toMap(ResearchCategory::key, Function.identity(), (a, b) -> a, LinkedHashMap::new));
+		Map<Identifier, ResearchCategory> categories = StreamSupport.stream(categoryList.spliterator(), false).map(NbtCompound.class::cast).map(nbt1 -> ResearchCategory.deserialize(nbt1, book)).sorted(Comparator.comparingInt(ResearchCategory::serializationIndex)).collect(toMap(ResearchCategory::key, Function.identity(), (a, b) -> a, LinkedHashMap::new));
 		
 		// this could be replaced by adding c to ClientBooks before deserializing, but this wouldn't look any different
 		// and would leave a broken book in if an exception occurs.

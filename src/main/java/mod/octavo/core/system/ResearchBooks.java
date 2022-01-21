@@ -1,6 +1,6 @@
-package net.arcanamod.systems.research;
+package mod.octavo.core.system;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -16,9 +16,9 @@ public class ResearchBooks{
 	
 	// public
 	// thats a bad idea I think
-	public static ArrayList<ResourceLocation> disabled = new ArrayList<>();
-	public static Map<ResourceLocation, ResearchBook> books = new LinkedHashMap<>();
-	public static Map<ResourceLocation, Puzzle> puzzles = new LinkedHashMap<>();
+	public static ArrayList<Identifier> disabled = new ArrayList<>();
+	public static Map<Identifier, ResearchBook> books = new LinkedHashMap<>();
+	public static Map<Identifier, Puzzle> puzzles = new LinkedHashMap<>();
 	
 	public static List<ResearchBook> getBooks(){
 		return new ArrayList<>(books.values());
@@ -32,7 +32,7 @@ public class ResearchBooks{
 		return streamCategories().collect(Collectors.toList());
 	}
 	
-	public static ResearchCategory getCategory(ResourceLocation key){
+	public static ResearchCategory getCategory(Identifier key){
 		return streamCategories().filter(x -> x.key().equals(key)).findFirst().orElse(null);
 	}
 	
@@ -52,7 +52,7 @@ public class ResearchBooks{
 		return streamChildrenOf(parent).collect(Collectors.toList());
 	}
 	
-	public static ResearchEntry getEntry(ResourceLocation key){
+	public static ResearchEntry getEntry(Identifier key){
 		return streamEntries().filter(x -> x.key().equals(key)).findFirst().orElse(null);
 	}
 

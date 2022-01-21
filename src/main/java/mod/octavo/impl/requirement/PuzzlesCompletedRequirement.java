@@ -1,16 +1,16 @@
-package net.arcanamod.systems.research.impls;
+package mod.octavo.impl.requirement;
 
 import net.arcanamod.capabilities.Researcher;
-import net.arcanamod.systems.research.Requirement;
+import mod.octavo.core.system.Requirement;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Identifier;
 
 import static net.arcanamod.Arcana.arcLoc;
 
 public class PuzzlesCompletedRequirement extends Requirement{
 	
-	public static final ResourceLocation TYPE = arcLoc("puzzles_completed");
+	public static final Identifier TYPE = arcLoc("puzzles_completed");
 	
 	public boolean satisfied(PlayerEntity player){
 		return Researcher.getFrom(player).getPuzzlesCompleted() >= getAmount();
@@ -20,11 +20,11 @@ public class PuzzlesCompletedRequirement extends Requirement{
 		// no-op
 	}
 	
-	public ResourceLocation type(){
+	public Identifier type(){
 		return TYPE;
 	}
 	
-	public CompoundNBT data(){
-		return new CompoundNBT();
+	public NbtCompound data(){
+		return new NbtCompound();
 	}
 }

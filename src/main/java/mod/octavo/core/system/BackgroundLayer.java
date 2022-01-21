@@ -1,10 +1,10 @@
-package net.arcanamod.systems.research;
+package mod.octavo.core.system;
 
 import com.google.gson.JsonObject;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.arcanamod.systems.research.impls.ImageLayer;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.util.math.MatrixStack;
+import mod.octavo.impl.ImageLayer;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Identifier;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -15,10 +15,10 @@ public abstract class BackgroundLayer{
 	
 	////////// static stuff
 	
-	private static Map<ResourceLocation, Supplier<BackgroundLayer>> factories = new LinkedHashMap<>();
-	private static Map<ResourceLocation, Function<CompoundNBT, BackgroundLayer>> deserializers = new LinkedHashMap<>();
+	private static Map<Identifier, Supplier<BackgroundLayer>> factories = new LinkedHashMap<>();
+	private static Map<Identifier, Function<NbtCompound, BackgroundLayer>> deserializers = new LinkedHashMap<>();
 	
-	public static BackgroundLayer makeLayer(ResourceLocation type, JsonObject content, ResourceLocation file, float speed, float vanishZoom){
+	public static BackgroundLayer makeLayer(Identifier type, JsonObject content, Identifier file, float speed, float vanishZoom){
 		if(getBlank(type) != null){
 			BackgroundLayer layer = getBlank(type).get();
 			layer.setSpeed(speed);
@@ -29,9 +29,9 @@ public abstract class BackgroundLayer{
 			return null;
 	}
 	
-	public static BackgroundLayer deserialize(CompoundNBT passData){
-		ResourceLocation type = new ResourceLocation(passData.getString("type"));
-		CompoundNBT data = passData.getCompound("data");
+	public static BackgroundLayer deserialize(NbtCompound passData){
+		Identifier type = new Identifier(passData.getString("type"));
+		NbtCompound data = passData.getCompound("data");
 		float speed = passData.getFloat("speed");
 		float vanishZoom = passData.getFloat("vanishZoom");
 		if(deserializers.get(type) != null){
@@ -42,7 +42,7 @@ public abstract class BackgroundLayer{
 		return null;
 	}
 	
-	public static Supplier<BackgroundLayer> getBlank(ResourceLocation type){
+	public static Supplier<BackgroundLayer> getBlank(Identifier type){
 		return factories.get(type);
 	}
 	
@@ -73,8 +73,8 @@ public abstract class BackgroundLayer{
 		return this;
 	}
 	
-	public CompoundNBT getPassData(){
-		CompoundNBT nbt = new CompoundNBT();
+	public NbtCompound getPassData(){
+		NbtCompound nbt = new NbtCompound();
 		nbt.putString("type", type().toString());
 		nbt.put("data", data());
 		nbt.putFloat("speed", speed());
@@ -82,11 +82,11 @@ public abstract class BackgroundLayer{
 		return nbt;
 	}
 	
-	public abstract ResourceLocation type();
+	public abstract Identifier type();
 	
-	public abstract CompoundNBT data();
+	public abstract NbtCompound data();
 	
-	public abstract void load(JsonObject data, ResourceLocation file);
+	public abstract void load(JsonObject data, Identifier file);
 	
 	public abstract void render(MatrixStack stack, int x, int y, int width, int height, float xPan, float yPan, float parallax, float xOff, float yOff, float zoom);
 }

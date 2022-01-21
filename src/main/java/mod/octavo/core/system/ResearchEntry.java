@@ -1,9 +1,12 @@
-package net.arcanamod.systems.research;
+package mod.octavo.core.system;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
+import mod.octavo.api.EntrySection;
+import mod.octavo.api.Icon;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.nbt.StringNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
 import java.util.Collections;
@@ -19,7 +22,7 @@ import static net.arcanamod.util.StreamUtils.streamAndApply;
  */
 public class ResearchEntry{
 	
-	private ResourceLocation key;
+	private Identifier key;
 	private List<EntrySection> sections;
 	private List<String> meta;
 	private List<Parent> parents;
@@ -30,7 +33,7 @@ public class ResearchEntry{
 	
 	private int x, y;
 	
-	public ResearchEntry(ResourceLocation key, List<EntrySection> sections, List<Icon> icons, List<String> meta, List<Parent> parents, ResearchCategory category, String name, String desc, int x, int y){
+	public ResearchEntry(Identifier key, List<EntrySection> sections, List<Icon> icons, List<String> meta, List<Parent> parents, ResearchCategory category, String name, String desc, int x, int y){
 		this.key = key;
 		this.sections = sections;
 		this.icons = icons;
@@ -63,7 +66,7 @@ public class ResearchEntry{
 		return category;
 	}
 	
-	public ResourceLocation key(){
+	public Identifier key(){
 		return key;
 	}
 	
@@ -83,8 +86,8 @@ public class ResearchEntry{
 		return y;
 	}
 	
-	public CompoundNBT serialize(ResourceLocation tag){
-		CompoundNBT nbt = new CompoundNBT();
+	public NbtCompound serialize(Identifier tag){
+		NbtCompound nbt = new NbtCompound();
 		// key
 		nbt.putString("id", tag.toString());
 		// name, desc
@@ -94,34 +97,34 @@ public class ResearchEntry{
 		nbt.putInt("x", x());
 		nbt.putInt("y", y());
 		// sections
-		ListNBT list = new ListNBT();
+		NbtList list = new NbtList();
 		sections().forEach((section) -> list.add(section.getPassData()));
 		nbt.put("sections", list);
 		// icons
-		ListNBT icons = new ListNBT();
-		icons().forEach((icon) -> icons.add(StringNBT.valueOf(icon.toString())));
+		NbtList icons = new NbtList();
+		icons().forEach((icon) -> icons.add(NbtString.of(icon.toString())));
 		nbt.put("icons", icons);
 		// parents
-		ListNBT parents = new ListNBT();
-		parents().forEach((parent) -> parents.add(StringNBT.valueOf(parent.asString())));
+		NbtList parents = new NbtList();
+		parents().forEach((parent) -> parents.add(NbtString.of(parent.asString())));
 		nbt.put("parents", parents);
 		// meta
-		ListNBT meta = new ListNBT();
-		meta().forEach((met) -> meta.add(StringNBT.valueOf(met)));
+		NbtList meta = new NbtList();
+		meta().forEach((met) -> meta.add(NbtString.of(met)));
 		nbt.put("meta", meta);
 		return nbt;
 	}
 	
-	public static ResearchEntry deserialize(CompoundNBT nbt, ResearchCategory in){
-		ResourceLocation key = new ResourceLocation(nbt.getString("id"));
+	public static ResearchEntry deserialize(NbtCompound nbt, ResearchCategory in){
+		Identifier key = new Identifier(nbt.getString("id"));
 		String name = nbt.getString("name");
 		String desc = nbt.getString("desc");
 		int x = nbt.getInt("x");
 		int y = nbt.getInt("y");
-		List<EntrySection> sections = streamAndApply(nbt.getList("sections", 10), CompoundNBT.class, EntrySection::deserialze).collect(Collectors.toList());
-		List<Parent> betterParents = streamAndApply(nbt.getList("parents", 8), StringNBT.class, StringNBT::getString).map(Parent::parse).collect(Collectors.toList());
-		List<Icon> icons = streamAndApply(nbt.getList("icons", 8), StringNBT.class, StringNBT::getString).map(Icon::fromString).collect(Collectors.toList());
-		List<String> meta = streamAndApply(nbt.getList("meta", 8), StringNBT.class, StringNBT::getString).collect(Collectors.toList());
+		List<EntrySection> sections = streamAndApply(nbt.getList("sections", 10), NbtCompound.class, EntrySection::deserialze).collect(Collectors.toList());
+		List<Parent> betterParents = streamAndApply(nbt.getList("parents", 8), NbtString.class, NbtString::asString).map(Parent::parse).collect(Collectors.toList());
+		List<Icon> icons = streamAndApply(nbt.getList("icons", 8), NbtString.class, NbtString::asString).map(Icon::fromString).collect(Collectors.toList());
+		List<String> meta = streamAndApply(nbt.getList("meta", 8), NbtString.class, NbtString::asString).collect(Collectors.toList());
 		return new ResearchEntry(key, sections, icons, meta, betterParents, in, name, desc, x, y);
 	}
 	

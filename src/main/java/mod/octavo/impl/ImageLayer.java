@@ -1,11 +1,11 @@
-package net.arcanamod.systems.research.impls;
+package mod.octavo.impl;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.arcanamod.systems.research.BackgroundLayer;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.util.math.MatrixStack;
+import mod.octavo.core.system.BackgroundLayer;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,34 +13,34 @@ import static net.arcanamod.Arcana.arcLoc;
 
 public class ImageLayer extends BackgroundLayer{
 	
-	public static final ResourceLocation TYPE = arcLoc("image");
+	public static final Identifier TYPE = arcLoc("image");
 	
-	public ResourceLocation image;
+	public Identifier image;
 	
 	private static final Logger LOGGER = LogManager.getLogger();
 	
 	public ImageLayer(){}
 	
 	public ImageLayer(String image){
-		this.image = new ResourceLocation(image);
+		this.image = new Identifier(image);
 	}
 	
-	public ResourceLocation type(){
+	public Identifier type(){
 		return TYPE;
 	}
 	
-	public CompoundNBT data(){
-		CompoundNBT data = new CompoundNBT();
+	public NbtCompound data(){
+		NbtCompound data = new NbtCompound();
 		data.putString("image", image.toString());
 		return data;
 	}
 	
-	public void load(JsonObject data, ResourceLocation file){
+	public void load(JsonObject data, Identifier file){
 		JsonPrimitive imagePrim = data.getAsJsonPrimitive("image");
 		if(imagePrim != null)
 			if(imagePrim.isString()){
-				ResourceLocation base = new ResourceLocation(imagePrim.getAsString());
-				image = new ResourceLocation(base.getNamespace(), "textures/" + base.getPath() + ".png");
+				Identifier base = new Identifier(imagePrim.getAsString());
+				image = new Identifier(base.getNamespace(), "textures/" + base.getPath() + ".png");
 			}else
 				LOGGER.error("Field \"image\" for an image background layer was not a string, in " + file + "!");
 		else
