@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "id": "octavo",
+  "version": "${version}",
+
+  "name": "Octavo",
+  "description": "Octavo is an another book documentation api with a progression tree. Like Thaumcraft or Arcana had",
+  "authors": [
+    "Prefex",
+    "l_Luna",
+    "Falkory",
+    "Monster Zero",
+    "ProjectET",
+    "MoriyaShiine",
+    "leia",
+    "Mozaran",
+    "Amy",
+    "AK9"
+  ],
+  "contact": {
+    "homepage": "https://prefex.dev/octavo",
+    "sources": "https://github.com/TeamAOF/Octavo-API"
+  },
+
+  "license": "LGPLv3",
+  "icon": "assets/octavo/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "mod.octavo.core.Octavo"
+    ]
+  },
+  "mixins": [
+    "octavo.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.11.3",
+    "fabric": "*",
+    "minecraft": "1.18.x",
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
