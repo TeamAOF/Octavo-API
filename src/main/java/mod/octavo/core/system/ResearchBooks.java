@@ -16,9 +16,7 @@ public class ResearchBooks{
 	
 	// public
 	// thats a bad idea I think
-	public static ArrayList<Identifier> disabled = new ArrayList<>();
 	public static Map<Identifier, Book> books = new LinkedHashMap<>();
-	public static Map<Identifier, Puzzle> puzzles = new LinkedHashMap<>();
 	
 	public static List<Book> getBooks(){
 		return new ArrayList<>(books.values());
@@ -54,11 +52,5 @@ public class ResearchBooks{
 	
 	public static ResearchEntry getEntry(Identifier key){
 		return streamEntries().filter(x -> x.key().equals(key)).findFirst().orElse(null);
-	}
-
-	static {
-		//disabled.add(Arcana.arcLoc("illustrious_grimoire"));
-		//disabled.add(Arcana.arcLoc("tainted_codex"));
-		//disabled.add(Arcana.arcLoc("crimson_rites"));
 	}
 }

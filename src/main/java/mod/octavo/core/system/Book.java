@@ -18,7 +18,7 @@ import static java.util.stream.Collectors.toMap;
  */
 public class Book {
 	
-	protected Map<Identifier, Category> categories;
+	public Map<Identifier, Category> categories;
 	private Identifier key;
 	private String prefix;
 	

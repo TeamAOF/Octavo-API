@@ -12,8 +12,12 @@ import org.jetbrains.annotations.Nullable;
 /**
  * A quick reference to a specific page in a research book, which may point to an item's recipe.
  */
-public record Pin(@Nullable Item result, ResearchEntry entry, int stage, Icon icon) {
-	
+public class Pin {
+	private @Nullable Item result;
+	private ResearchEntry entry;
+	private int stage;
+	private Icon icon;
+
 	public Pin(@Nullable Item result, ResearchEntry entry, int stage, Icon icon){
 		this.result = result;
 		this.entry = entry;
@@ -28,8 +32,8 @@ public record Pin(@Nullable Item result, ResearchEntry entry, int stage, Icon ic
 		if(entry.sections().size() > stage){
 			this.stage = stage;
 			EntrySection section = entry.sections().get(stage);
-			if(section instanceof AbstractCraftingSection && world.getRecipeManager().getRecipe(((AbstractCraftingSection)section).getRecipe()).isPresent()){
-				Recipe<?> recipe = world.getRecipeManager().getRecipe(((AbstractCraftingSection)section).getRecipe()).get();
+			if(section instanceof AbstractCraftingSection && world.getRecipeManager().get(((AbstractCraftingSection)section).getRecipe()).isPresent()){
+				Recipe<?> recipe = world.getRecipeManager().get(((AbstractCraftingSection)section).getRecipe()).get();
 				this.icon = new Icon(recipe.getOutput());
 				this.result = recipe.getOutput().getItem();
 			}else

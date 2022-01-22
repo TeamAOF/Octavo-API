@@ -81,7 +81,7 @@ public class Icon {
 			ItemStack stack = new ItemStack(item);
 			// Apply NBT, if any.
 			if(tag != null)
-				stack.setTag(tag);
+				stack.setNbt(tag);
 			// Return icon.
 			return new Icon(key, stack);
 		}
@@ -99,15 +99,15 @@ public class Icon {
 		if(stack == null)
 			return new Identifier(identifier.getNamespace(), identifier.getPath().substring(9)).toString();
 		// If there's no NBT, just send over the item's ID.
-		if(!stack.hasTag())
+		if(!stack.hasNbt())
 			return identifier.toString();
 		// Otherwise, we need to send over both.
-		return identifier.toString() + nbtToJson(stack.getTag());
+		return identifier.toString() + nbtToJson(stack.getNbt());
 	}
 	
 	private static String nbtToJson(NbtCompound nbt){
 		StringBuilder stringbuilder = new StringBuilder("{");
-		Collection<String> collection = nbt.keySet();
+		Collection<String> collection = nbt.getKeys();
 		
 		for(String s : collection){
 			if(stringbuilder.length() != 1)
@@ -120,6 +120,6 @@ public class Icon {
 	private static final Pattern SIMPLE_VALUE = Pattern.compile("[A-Za-z0-9._+-]+");
 	
 	protected static String handleEscape(String in){
-		return SIMPLE_VALUE.matcher(in).matches() ? "\"" + in + "\"" : NbtString.quoteAndEscape(in);
+		return SIMPLE_VALUE.matcher(in).matches() ? "\"" + in + "\"" : NbtString.escape(in); // was quoteAndEscape
 	}
 }

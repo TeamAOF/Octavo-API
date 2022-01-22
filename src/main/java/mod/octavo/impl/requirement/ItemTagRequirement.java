@@ -24,11 +24,11 @@ public class ItemTagRequirement extends Requirement{
 	}
 	
 	public boolean satisfied(PlayerEntity player){
-		return player.getInventory().func_234564_a_(x -> x.getItem().isIn(tag), 0, player.container.func_234641_j_()) >= (getAmount() == 0 ? 1 : getAmount());
+		return player.getInventory().remove(x -> tag.contains(x.getItem()), 0, player.playerScreenHandler.getCraftingInput()) >= (getAmount() == 0 ? 1 : getAmount());
 	}
 	
 	public void take(PlayerEntity player){
-		player.getInventory().func_234564_a_(x -> x.getItem().isIn(tag), getAmount(), player.container.func_234641_j_());
+		player.getInventory().remove(x -> tag.contains(x.getItem()), getAmount(), player.playerScreenHandler.getCraftingInput());
 	}
 	
 	public Identifier type(){

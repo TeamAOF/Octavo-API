@@ -40,7 +40,7 @@ public abstract class Requirement{
 	
 	////////// instance stuff
 	
-	protected int amount = 1;
+	public int amount = 1;
 	
 	public int getAmount(){
 		return amount;

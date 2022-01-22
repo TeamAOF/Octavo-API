@@ -1,8 +1,6 @@
 package mod.octavo.core.system;
 
-import net.arcanamod.capabilities.Researcher;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.IdentifierException;
 import net.minecraft.util.InvalidIdentifierException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -77,13 +75,13 @@ public class Parent{
 	public boolean shouldReverseLine(){
 		return reverseLine;
 	}
-	
-	public boolean satisfiedBy(Researcher r){
+
+	/*public boolean satisfiedBy(Researcher r){
 		ResearchEntry entry = ResearchBooks.getEntry(getEntry());
 		if(entry == null)
 			return true;
 		if(entry.meta().contains("locked"))
 			return false;
 		return stage == -1 ? r.entryStage(entry) >= entry.sections().size() : r.entryStage(entry) >= stage;
-	}
+	}*/
 }

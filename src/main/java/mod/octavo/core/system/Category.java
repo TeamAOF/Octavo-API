@@ -1,6 +1,7 @@
 package mod.octavo.core.system;
 
 import mod.octavo.api.BackgroundLayer;
+import mod.octavo.core.OctavoReference;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.util.Identifier;
@@ -15,7 +16,7 @@ import java.util.stream.Stream;
  */
 public class Category {
 	
-	protected Map<Identifier, ResearchEntry> entries;
+	public Map<Identifier, ResearchEntry> entries;
 	private Identifier key, icon, bg, requirement;
 	private Book in;
 	private String name;
@@ -111,7 +112,7 @@ public class Category {
 		Map<Identifier, ResearchEntry> entries = entriesList.stream().map(NbtCompound.class::cast).map((NbtCompound nbt1) -> ResearchEntry.deserialize(nbt1, category)).collect(Collectors.toMap(ResearchEntry::key, Function.identity(), (a, b) -> a));
 		c.putAll(entries);
 		
-		category.bgs = nbt.getList("bgs", Constants.NBT.TAG_COMPOUND).stream().map(NbtCompound.class::cast).map(BackgroundLayer::deserialize).collect(Collectors.toList());
+		category.bgs = nbt.getList("bgs", OctavoReference.TAG_COMPOUND).stream().map(NbtCompound.class::cast).map(BackgroundLayer::deserialize).collect(Collectors.toList());
 		return category;
 	}
 	

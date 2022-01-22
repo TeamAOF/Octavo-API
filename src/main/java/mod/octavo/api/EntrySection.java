@@ -55,7 +55,7 @@ public abstract class EntrySection{
 	// instance stuff
 	
 	protected List<Requirement> requirements = new ArrayList<>();
-	protected Identifier entry;
+	public Identifier entry;
 	
 	public void addRequirement(Requirement requirement){
 		requirements.add(requirement);

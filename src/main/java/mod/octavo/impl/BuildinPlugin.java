@@ -42,9 +42,4 @@ public class BuildinPlugin implements OctavoPlugin {
         registry.registerFactory(ImageLayer.TYPE, ImageLayer::new);
         registry.registerDeserializer(ImageLayer.TYPE, nbt -> new ImageLayer(nbt.getString("image")));
     }
-
-    @Override
-    public void registerBooks() {
-
-    }
 }
