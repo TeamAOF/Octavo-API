@@ -1,18 +1,16 @@
 package mod.octavo.api;
 
 import mod.octavo.core.system.ResearchEntry;
-import mod.octavo.impl.requirement.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public abstract class Requirement{
 	
@@ -38,15 +36,6 @@ public abstract class Requirement{
 			return requirement;
 		}
 		return null;
-	}
-	
-	public static void init(){
-		// item and item tag requirement creation is handled by ResearchLoader -- an explicit form may be useful though.
-		deserializers.put(ItemRequirement.TYPE, compound -> new ItemRequirement(Registry.ITEM.get(new Identifier(compound.getString("itemType")))));
-		deserializers.put(ItemTagRequirement.TYPE, compound -> new ItemTagRequirement(new Identifier(compound.getString("itemTag"))));
-		
-		factories.put(XpRequirement.TYPE, __ -> new XpRequirement());
-		deserializers.put(XpRequirement.TYPE, __ -> new XpRequirement());
 	}
 	
 	////////// instance stuff
@@ -94,4 +83,15 @@ public abstract class Requirement{
 	public int hashCode(){
 		return Objects.hash(getAmount(), type());
 	}
+
+    public static class ORegistry {
+		public boolean registerFactory(Identifier id, Function<List<String>, Requirement> factory){
+			factories.put(id, factory);
+			return true;
+		}
+		public boolean registerDeserializer(Identifier id, Function<NbtCompound, Requirement> deserializer){
+			deserializers.put(id, deserializer);
+			return true;
+		}
+    }
 }

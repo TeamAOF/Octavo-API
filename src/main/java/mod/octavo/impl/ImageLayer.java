@@ -3,6 +3,7 @@ package mod.octavo.impl;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import mod.octavo.core.Octavo;
+import mod.octavo.core.OctavoReference;
 import net.minecraft.client.util.math.MatrixStack;
 import mod.octavo.api.BackgroundLayer;
 import net.minecraft.nbt.NbtCompound;
@@ -12,7 +13,7 @@ import org.apache.logging.log4j.Logger;
 
 public class ImageLayer extends BackgroundLayer{
 	
-	public static final Identifier TYPE = new Identifier(Octavo.MODID,"image");
+	public static final Identifier TYPE = new Identifier(OctavoReference.MODID,"image");
 	
 	public Identifier image;
 	

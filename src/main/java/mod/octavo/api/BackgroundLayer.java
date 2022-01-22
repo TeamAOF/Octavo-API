@@ -46,11 +46,6 @@ public abstract class BackgroundLayer{
 		return factories.get(type);
 	}
 	
-	public static void init(){
-		factories.put(ImageLayer.TYPE, ImageLayer::new);
-		deserializers.put(ImageLayer.TYPE, nbt -> new ImageLayer(nbt.getString("image")));
-	}
-	
 	///////// instance stuff
 	
 	protected float speed = 0.5f, vanishZoom = -1;
@@ -89,4 +84,15 @@ public abstract class BackgroundLayer{
 	public abstract void load(JsonObject data, Identifier file);
 	
 	public abstract void render(MatrixStack stack, int x, int y, int width, int height, float xPan, float yPan, float parallax, float xOff, float yOff, float zoom);
+
+	public static class ORegistry{
+		public boolean registerFactory(Identifier id, Supplier<BackgroundLayer> factory){
+			factories.put(id, factory);
+			return true;
+		}
+		public boolean registerDeserializer(Identifier id, Function<NbtCompound, BackgroundLayer> deserializer){
+			deserializers.put(id, deserializer);
+			return true;
+		}
+	}
 }

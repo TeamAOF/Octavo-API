@@ -16,7 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static net.arcanamod.util.StreamUtils.streamAndApply;
+import static mod.octavo.util.StreamUtil.streamAndApply;
 
 /**
  * Represents one section of content - for example, continuous text, an image, or an inline recipe. May provide a number of pins.
@@ -24,15 +24,14 @@ import static net.arcanamod.util.StreamUtils.streamAndApply;
 public abstract class EntrySection{
 	
 	// static stuff
-	// when addon support is to be added: change this from strings to Identifiers so mods can register more
-	private static Map<String, Function<String, EntrySection>> factories = new LinkedHashMap<>();
-	private static Map<String, Function<NbtCompound, EntrySection>> deserializers = new LinkedHashMap<>();
+	private static Map<Identifier, Function<String, EntrySection>> factories = new LinkedHashMap<>();
+	private static Map<Identifier, Function<NbtCompound, EntrySection>> deserializers = new LinkedHashMap<>();
 	
-	public static Function<String, EntrySection> getFactory(String type){
+	public static Function<String, EntrySection> getFactory(Identifier type){
 		return factories.get(type);
 	}
 	
-	public static EntrySection makeSection(String type, String content){
+	public static EntrySection makeSection(Identifier type, String content){
 		if(getFactory(type) != null)
 			return getFactory(type).apply(content);
 		else
@@ -40,7 +39,7 @@ public abstract class EntrySection{
 	}
 	
 	public static EntrySection deserialze(NbtCompound passData){
-		String type = passData.getString("type");
+		Identifier type = new Identifier(passData.getString("type"));
 		NbtCompound data = passData.getCompound("data");
 		List<Requirement> requirements = streamAndApply(passData.getList("requirements", 10), NbtCompound.class, Requirement::deserialize).collect(Collectors.toList());
 		if(deserializers.get(type) != null){
@@ -52,18 +51,7 @@ public abstract class EntrySection{
 		}
 		return null;
 	}
-	
-	public static void init(){
-		factories.put(StringSection.TYPE, StringSection::new);
-		deserializers.put(StringSection.TYPE, nbt -> new StringSection(nbt.getString("text")));
-		factories.put(CraftingSection.TYPE, CraftingSection::new);
-		deserializers.put(CraftingSection.TYPE, nbt -> new CraftingSection(nbt.getString("recipe")));
-		factories.put(SmeltingSection.TYPE, SmeltingSection::new);
-		deserializers.put(SmeltingSection.TYPE, nbt -> new SmeltingSection(nbt.getString("recipe")));
-		factories.put(ImageSection.TYPE, ImageSection::new);
-		deserializers.put(ImageSection.TYPE, nbt -> new ImageSection(nbt.getString("image")));
-	}
-	
+
 	// instance stuff
 	
 	protected List<Requirement> requirements = new ArrayList<>();
@@ -79,7 +67,7 @@ public abstract class EntrySection{
 	
 	public NbtCompound getPassData(){
 		NbtCompound nbt = new NbtCompound();
-		nbt.putString("type", getType());
+		nbt.putString("type", getType().toString());
 		nbt.put("data", getData());
 		nbt.putString("entry", getEntry().toString());
 		
@@ -94,7 +82,7 @@ public abstract class EntrySection{
 		return entry;
 	}
 	
-	public abstract String getType();
+	public abstract Identifier getType();
 	
 	public abstract NbtCompound getData();
 	
@@ -114,5 +102,16 @@ public abstract class EntrySection{
 	 */
 	public Stream<Pin> getPins(int index, World world, ResearchEntry entry){
 		return Stream.empty();
+	}
+
+	public static class ORegistry{
+		public boolean registerFactory(Identifier id, Function<String, EntrySection> factory){
+			factories.put(id, factory);
+			return true;
+		}
+		public boolean registerDeserializer(Identifier id, Function<NbtCompound, EntrySection> deserializer){
+			deserializers.put(id, deserializer);
+			return true;
+		}
 	}
 }

@@ -1,12 +1,14 @@
 package mod.octavo.impl.section;
 
 import mod.octavo.api.EntrySection;
+import mod.octavo.core.Octavo;
+import mod.octavo.core.OctavoReference;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Identifier;
 
 public class ImageSection extends EntrySection{
 	
-	public static final String TYPE = "image";
+	public static final Identifier TYPE = new Identifier(OctavoReference.MODID,"image");
 	
 	Identifier image;
 	
@@ -18,7 +20,7 @@ public class ImageSection extends EntrySection{
 		this.image = image;
 	}
 	
-	public String getType(){
+	public Identifier getType(){
 		return TYPE;
 	}
 	

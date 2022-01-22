@@ -4,17 +4,17 @@ import net.minecraft.util.Identifier;
 
 public class CraftingSection extends AbstractCraftingSection{
 	
-	public static final String TYPE = "crafting";
-	
+	public static final Identifier TYPE = new Identifier("minecraft","crafting");
+
 	public CraftingSection(Identifier recipe){
 		super(recipe);
 	}
-	
-	public CraftingSection(String s){
-		super(s);
+
+	public CraftingSection(String recipe){
+		this(new Identifier(recipe));
 	}
 	
-	public String getType(){
+	public Identifier getType(){
 		return TYPE;
 	}
 }

@@ -1,7 +1,9 @@
 package mod.octavo.impl.section;
 
 import mod.octavo.api.EntrySection;
+import mod.octavo.core.OctavoReference;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Identifier;
 
 import java.util.Objects;
 
@@ -10,7 +12,7 @@ import java.util.Objects;
  */
 public class StringSection extends EntrySection{
 	
-	public static final String TYPE = "string";
+	public static final Identifier TYPE = new Identifier(OctavoReference.MODID,"string");
 	
 	String content;
 	
@@ -18,7 +20,7 @@ public class StringSection extends EntrySection{
 		this.content = content;
 	}
 	
-	public String getType(){
+	public Identifier getType(){
 		return TYPE;
 	}
 	

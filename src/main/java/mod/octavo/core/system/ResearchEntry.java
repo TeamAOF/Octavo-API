@@ -5,7 +5,6 @@ import mod.octavo.api.Icon;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
-import net.minecraft.nbt.StringNBT;
 import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
 
@@ -15,7 +14,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static net.arcanamod.util.StreamUtils.streamAndApply;
+import static mod.octavo.util.StreamUtil.streamAndApply;
 
 /**
  * Represents a node in the research tree. Stores an ordered list of entry sections representing its content.

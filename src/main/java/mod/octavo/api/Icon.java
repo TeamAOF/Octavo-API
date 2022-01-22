@@ -6,10 +6,10 @@ import mod.octavo.core.system.ResearchEntry;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.StringNBT;
+import net.minecraft.nbt.NbtHelper;
+import net.minecraft.nbt.NbtString;
 import net.minecraft.util.Identifier;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
@@ -28,7 +28,7 @@ import java.util.regex.Pattern;
  * @see Pin
  * @see JsonToNBT
  */
-public record Icon(Identifier Identifier, ItemStack stack) {
+public class Icon {
 	
 	// Either an item, with optional NBT data, or an direct image reference.
 	// Images are assumed to be in <namespace>:textures/.
@@ -36,16 +36,19 @@ public record Icon(Identifier Identifier, ItemStack stack) {
 	// NBT data can be encoded too. When NBT data is present, an error will be logged if the reference is not an item.
 	// NBT data is added in curly braces after the ID, as valid JSON.
 	// See JsonToNBT.
-	
+
+	private Identifier identifier;
+	private ItemStack stack;
+
 	private static final Logger LOGGER = LogManager.getLogger();
 	
-	public Icon(Identifier Identifier, @Nullable ItemStack stack){
-		this.Identifier = Identifier;
+	public Icon(Identifier identifier, @Nullable ItemStack stack){
+		this.identifier = identifier;
 		this.stack = stack;
 	}
 	
 	public Icon(ItemStack stack){
-		this.Identifier = stack.getItem().getRegistryName();
+		this.identifier = Registry.ITEM.getId(stack.getItem());
 		this.stack = stack;
 	}
 	
@@ -55,7 +58,7 @@ public record Icon(Identifier Identifier, ItemStack stack) {
 	}
 	
 	public Identifier getIdentifier(){
-		return Identifier;
+		return identifier;
 	}
 	
 	public static Icon fromString(String string){
@@ -64,7 +67,7 @@ public record Icon(Identifier Identifier, ItemStack stack) {
 		if(string.contains("{")){
 			String[] split = string.split("\\{", 2);
 			try{
-				tag = JsonToNBT.getTagFromJson("{" + split[1]);
+				tag = NbtHelper.fromNbtProviderString().getTagFromJson("{" + split[1]);
 				string = split[0];
 			}catch(CommandSyntaxException e){
 				e.printStackTrace();
@@ -73,8 +76,8 @@ public record Icon(Identifier Identifier, ItemStack stack) {
 		}
 		// Check if there's an item that corresponds to the ID.
 		Identifier key = new Identifier(string);
-		if(ForgeRegistries.ITEMS.containsKey(key)){
-			Item item = ForgeRegistries.ITEMS.getValue(key);
+		if(Registry.ITEM.containsId(key)){
+			Item item = Registry.ITEM.get(key);
 			ItemStack stack = new ItemStack(item);
 			// Apply NBT, if any.
 			if(tag != null)
@@ -94,12 +97,12 @@ public record Icon(Identifier Identifier, ItemStack stack) {
 	public String toString(){
 		// If ItemStack is null, just provide the key, but substring'd by 9.
 		if(stack == null)
-			return new Identifier(Identifier.getNamespace(), Identifier.getPath().substring(9)).toString();
+			return new Identifier(identifier.getNamespace(), identifier.getPath().substring(9)).toString();
 		// If there's no NBT, just send over the item's ID.
 		if(!stack.hasTag())
-			return Identifier.toString();
+			return identifier.toString();
 		// Otherwise, we need to send over both.
-		return Identifier.toString() + nbtToJson(stack.getTag());
+		return identifier.toString() + nbtToJson(stack.getTag());
 	}
 	
 	private static String nbtToJson(NbtCompound nbt){
@@ -109,7 +112,7 @@ public record Icon(Identifier Identifier, ItemStack stack) {
 		for(String s : collection){
 			if(stringbuilder.length() != 1)
 				stringbuilder.append(',');
-			stringbuilder.append(handleEscape(s)).append(':').append(nbt.get(s) instanceof StringNBT ? "\"" + nbt.getString(s) + "\"" : nbt.get(s));
+			stringbuilder.append(handleEscape(s)).append(':').append(nbt.get(s) instanceof NbtString ? "\"" + nbt.getString(s) + "\"" : nbt.get(s));
 		}
 		return stringbuilder.append('}').toString();
 	}
@@ -117,6 +120,6 @@ public record Icon(Identifier Identifier, ItemStack stack) {
 	private static final Pattern SIMPLE_VALUE = Pattern.compile("[A-Za-z0-9._+-]+");
 	
 	protected static String handleEscape(String in){
-		return SIMPLE_VALUE.matcher(in).matches() ? "\"" + in + "\"" : StringNBT.quoteAndEscape(in);
+		return SIMPLE_VALUE.matcher(in).matches() ? "\"" + in + "\"" : NbtString.quoteAndEscape(in);
 	}
 }

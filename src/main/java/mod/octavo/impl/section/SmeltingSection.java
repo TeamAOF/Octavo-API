@@ -4,17 +4,17 @@ import net.minecraft.util.Identifier;
 
 public class SmeltingSection extends AbstractCraftingSection{
 	
-	public static final String TYPE = "smelting";
+	public static final Identifier TYPE = new Identifier("minecraft","smelting");
 	
 	public SmeltingSection(Identifier recipe){
 		super(recipe);
 	}
-	
-	public SmeltingSection(String s){
-		super(s);
+
+	public SmeltingSection(String recipe){
+		this(new Identifier(recipe));
 	}
 	
-	public String getType(){
+	public Identifier getType(){
 		return TYPE;
 	}
 }
