@@ -67,7 +67,7 @@ public class Icon {
 		if(string.contains("{")){
 			String[] split = string.split("\\{", 2);
 			try{
-				tag = NbtHelper.fromNbtProviderString().getTagFromJson("{" + split[1]);
+				tag = JsonToNBT.getTagFromJson("{" + split[1]);
 				string = split[0];
 			}catch(CommandSyntaxException e){
 				e.printStackTrace();
