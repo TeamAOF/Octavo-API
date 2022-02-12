@@ -8,6 +8,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtHelper;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.nbt.StringNbtReader;
+import net.minecraft.nbt.visitor.StringNbtWriter;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import org.apache.logging.log4j.LogManager;
@@ -60,14 +62,15 @@ public class Icon {
 	public Identifier getIdentifier(){
 		return identifier;
 	}
-	
+
 	public static Icon fromString(String string){
 		// Check if theres NBT data.
 		NbtCompound tag = null;
 		if(string.contains("{")){
 			String[] split = string.split("\\{", 2);
 			try{
-				tag = JsonToNBT.getTagFromJson("{" + split[1]);
+				//no idea if this works
+				tag = StringNbtReader.parse("{" + split[1]);
 				string = split[0];
 			}catch(CommandSyntaxException e){
 				e.printStackTrace();
@@ -106,6 +109,7 @@ public class Icon {
 	}
 	
 	private static String nbtToJson(NbtCompound nbt){
+		//TODO: maybe use {@link StringNbtWriter} here?
 		StringBuilder stringbuilder = new StringBuilder("{");
 		Collection<String> collection = nbt.getKeys();
 		
